@@ -1,0 +1,11 @@
+# Global rule
+* @Ledermayer
+
+# All terraform code 
+*.tf @LederWorks/easy-terraform
+
+# Content Folder
+/.content/** @LederWorks/lederworks-admins
+
+# Github Folder
+/.github/** @LederWorks/lederworks-admins

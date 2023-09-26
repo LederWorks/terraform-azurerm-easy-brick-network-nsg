@@ -1,0 +1,47 @@
+name: Terratest - terraform-provider-easy-brick-category-purpose
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+on:
+  - pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.21
+
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.5.7
+        terraform_wrapper: false
+
+    - name: Login to Azure CLI
+      run: az login --service-principal --username ${{ secrets.ARM_CLIENT_ID }} --password ${{ secrets.ARM_CLIENT_SECRET }} --tenant ${{ secrets.ARM_TENANT_ID }}
+    
+    - name: Run tests
+      run: |
+        go get -v -t -d ./...
+        go test -v -timeout 99999s .
+      working-directory: ./.test
+
+    - name: Clean up failed resources
+      run: |
+        az group delete --name rgrp-tde3-it-terratest-network-nic --subscription ${{ secrets.ARM_SUBSCRIPTION_ID }} --yes
+      if: failure()
