@@ -24,3 +24,11 @@ output "nsg" {
 output "nsg_rules" {
   value = module.new_nsg.nsg_rules
 }
+
+output "sorted_default_inbound_rules" {
+  value = module.new_nsg.sorted_default_inbound_rules
+}
+
+output "sorted_default_outbound_rules" {
+  value = module.new_nsg.sorted_default_outbound_rules
+}

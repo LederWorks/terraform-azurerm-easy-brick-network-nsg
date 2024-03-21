@@ -38,44 +38,47 @@ resource "azurerm_network_security_rule" "default_rules" {
 }
 
 locals {
-  default_rules = [
-    for rule in azurerm_network_security_rule.default_rules : {
-      name              = rule.name
-      description       = rule.description
-      priority          = rule.priority
-      direction         = rule.direction
-      access            = rule.access
-      protocol          = rule.protocol
-      source_prefix     = rule.source_address_prefix
-      source_prefixes   = rule.source_address_prefixes
-      source_asg_ids    = rule.source_application_security_group_ids
-      source_port       = rule.source_port_range
-      source_ports      = rule.source_port_ranges
-      destination_prefix     = rule.destination_address_prefix
-      destination_prefixes   = rule.destination_address_prefixes
-      destination_asg_ids    = rule.destination_application_security_group_ids
-      destination_port       = rule.destination_port_range
-      destination_ports      = rule.destination_port_ranges
-      timeout_create    = rule.timeouts.create
-      timeout_update    = rule.timeouts.update
-      timeout_read      = rule.timeouts.read
-      timeout_delete    = rule.timeouts.delete
-    }
-  ]
+  # default_rules = [
+  #   for rule in azurerm_network_security_rule.default_rules : {
+  #     name              = rule.name
+  #     description       = rule.description
+  #     priority          = rule.priority
+  #     direction         = rule.direction
+  #     access            = rule.access
+  #     protocol          = rule.protocol
+  #     source_prefix     = rule.source_address_prefix
+  #     source_prefixes   = rule.source_address_prefixes
+  #     source_asg_ids    = rule.source_application_security_group_ids
+  #     source_port       = rule.source_port_range
+  #     source_ports      = rule.source_port_ranges
+  #     destination_prefix     = rule.destination_address_prefix
+  #     destination_prefixes   = rule.destination_address_prefixes
+  #     destination_asg_ids    = rule.destination_application_security_group_ids
+  #     destination_port       = rule.destination_port_range
+  #     destination_ports      = rule.destination_port_ranges
+  #     timeout_create    = rule.timeouts.create
+  #     timeout_update    = rule.timeouts.update
+  #     timeout_read      = rule.timeouts.read
+  #     timeout_delete    = rule.timeouts.delete
+  #   }
+  # ]
 
-  # Create a map of priority to list of rules
-  default_rules_priority_map = {
-    for rule in local.default_rules :
-    tostring(rule.priority) => rule
-  }
+  # Separate inbound and outbound rules 
+  default_inbound_rules = [for rule in azureazurerm_network_security_rule.default_rules : rule if rule.direction == "Inbound"]
+  default_outbound_rules = [for rule in azureazurerm_network_security_rule.default_rules : rule if rule.direction == "Outbound"]
 
-  # Create a list of priorities and sort them
-  default_rules_sorted_priorities = sort(keys(local.default_rules_priority_map))
+  # Create a map of priority to inbound rules
+  default_inbound_rules_priority_map = { for rule in local.default_inbound_rules : tostring(rule.priority) => rule }
 
-  # Use the sorted priorities to create a sorted list of rules
-  sorted_default_rules = [
-    for priority in local.default_rules_sorted_priorities :
-    local.default_rules_priority_map[priority]
-  ]
+  # Create a map of priority to outbound rules
+  default_outbound_rules_priority_map = { for rule in local.default_outbound_rules : tostring(rule.priority) => rule }
+
+  # Sort the priority keys
+  default_inbound_rules_sorted_priorities = sort(keys(local.default_inbound_rules_priority_map))
+  default_outbound_rules_sorted_priorities = sort(keys(local.default_outbound_rules_priority_map))
+
+  # Map the sorted priorities back to the rules
+  sorted_default_inbound_rules = [ for priority in local.default_inbound_rules_sorted_priorities : local.default_inbound_rules_priority_map[priority]]
+  sorted_default_outbound_rules = [ for priority in local.default_outbound_rules_sorted_priorities : local.default_outbound_rules_priority_map[priority]]
 
 }
