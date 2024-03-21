@@ -20,10 +20,10 @@ func TestTerraform(t *testing.T) {
 		BackendConfig: map[string]interface{}{
 			"tenant_id":            os.Getenv("ARM_TENANT_ID"),
 			"subscription_id":      os.Getenv("ARM_SUBSCRIPTION_ID"),
-			"resource_group_name":  "RGRP",
-			"storage_account_name": "SACC",
-			"container_name":       "CONTAINER",
-			"key":                  "KEY",
+			"resource_group_name":  os.Getenv("AZURERM_BACKEND_RGRP"),
+			"storage_account_name": os.Getenv("AZURERM_BACKEND_SACC"),
+			"container_name":       os.Getenv("AZURERM_BACKEND_CONTAINER"),
+			"key":                  "easy-brick-network-nsg.default.tfstate",
 		},
 	})
 
