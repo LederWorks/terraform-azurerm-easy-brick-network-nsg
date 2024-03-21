@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/LederWorks/golang-easy-terratest.git/rgrp"
+	"github.com/LederWorks/golang-easy-terratest/rgrp"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
 )
