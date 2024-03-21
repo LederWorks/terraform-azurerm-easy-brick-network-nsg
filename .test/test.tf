@@ -1,3 +1,10 @@
+#AppSecGroup
+resource "azurerm_application_security_group" "asgr-tde3-ic-terratest001" {
+  name                = module.naming.application_security_group
+  location            = azurerm_resource_group.rgrp.location
+  resource_group_name = azurerm_resource_group.rgrp.name
+}
+
 # Module Test
 module "new_nsg" {
   source = "../"
@@ -84,7 +91,7 @@ module "new_nsg" {
       name                = "Additional-Test"
       priority            = 1900
       direction           = "Inbound"
-      source_prefixes     = module.ranges.access_open_vpn
+      source_prefixes     = ["10.1.0.0/16", "10.2.0.0/16"]
       destination_asg_ids = [azurerm_application_security_group.asgr-tva2-ic-terratest001.id]
     }
   ]
@@ -94,7 +101,7 @@ module "new_nsg" {
       name                    = "Custom-Test"
       priority                = 3000
       direction               = "Inbound"
-      source_address_prefixes = module.ranges.access_desktop
+      source_prefixes = ["10.3.0.0/16", "10.4.0.0/16"]
       destination_port_range  = "80,443"
     }
   ]
