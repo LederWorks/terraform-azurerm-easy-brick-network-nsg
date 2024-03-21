@@ -64,18 +64,18 @@ locals {
   ]
 
   # Create a map of priority to list of rules
-  default_priority_map = {
+  default_rules_priority_map = {
     for rule in local.default_rules :
     tostring(rule.priority) => rule
   }
 
   # Create a list of priorities and sort them
-  default_sorted_priorities = sort(keys(local.default_priority_map))
+  default_rules_sorted_priorities = sort(keys(local.default_rules_priority_map))
 
   # Use the sorted priorities to create a sorted list of rules
   sorted_default_rules = [
-    for priority in local.default_sorted_priorities :
-    local.default_priority_map[priority]
+    for priority in local.default_rules_sorted_priorities :
+    local.default_rules_priority_map[priority]
   ]
 
 }

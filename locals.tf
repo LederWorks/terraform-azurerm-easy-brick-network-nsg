@@ -20,7 +20,7 @@ locals {
   } : {}
 
   nsg_rules = merge(
-    local.default_rules,
+    # local.default_rules,
     local.custom_rules,
     local.additional_rules
   )
