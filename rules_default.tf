@@ -38,7 +38,44 @@ resource "azurerm_network_security_rule" "default_rules" {
 }
 
 locals {
-  default_rules = {
-    for obj in azurerm_network_security_rule.default_rules : obj.name => obj
+  default_rules = [
+    for rule in azurerm_network_security_rule.default_rules : {
+      name              = rule.name
+      description       = rule.description
+      priority          = rule.priority
+      direction         = rule.direction
+      access            = rule.access
+      protocol          = rule.protocol
+      source_prefix     = rule.source_address_prefix
+      source_prefixes   = rule.source_address_prefixes
+      source_asg_ids    = rule.source_application_security_group_ids
+      source_port       = rule.source_port_range
+      source_ports      = rule.source_port_ranges
+      destination_prefix     = rule.destination_address_prefix
+      destination_prefixes   = rule.destination_address_prefixes
+      destination_asg_ids    = rule.destination_application_security_group_ids
+      destination_port       = rule.destination_port_range
+      destination_ports      = rule.destination_port_ranges
+      timeout_create    = rule.timeouts.create
+      timeout_update    = rule.timeouts.update
+      timeout_read      = rule.timeouts.read
+      timeout_delete    = rule.timeouts.delete
+    }
+  ]
+
+  # Create a map of priority to list of rules
+  default_priority_map = {
+    for rule in local.default_rules :
+    tostring(rule.priority) => rule
   }
+
+  # Create a list of priorities and sort them
+  default_sorted_priorities = sort(keys(local.default_priority_map))
+
+  # Use the sorted priorities to create a sorted list of rules
+  sorted_default_rules = [
+    for priority in local.default_sorted_priorities :
+    local.default_priority_map[priority]
+  ]
+
 }

@@ -22,3 +22,8 @@ output "nsg_rules" {
   value = local.nsg_rules
   description = "The Network Security Group (NSG) rules created by this module."
 }
+
+output "sorted_default_rules" {
+  value = local.sorted_default_rules
+  description = "The Network Security Group (NSG) default rules sorted by priority."
+}
