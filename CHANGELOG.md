@@ -9,6 +9,7 @@ FEATURES:
 
 ENHANCEMENTS:
 - Added location variable to be able to deviate from resource_group_object.location
+- Improved outputs
 - Updated minimum azurerm version to [3.64.0](https://github.com/hashicorp/terraform-provider-azurerm/blob/main/CHANGELOG-v3.md#3640-july-06-2023)
 
 BUG FIXES:

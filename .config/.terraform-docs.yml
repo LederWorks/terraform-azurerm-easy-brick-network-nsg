@@ -1,6 +1,6 @@
 formatter: markdown document
 
-version: "v0.2.0"
+version: ""
 header-from: .config/header.txt
 footer-from: .config/footer.txt
 
@@ -20,7 +20,7 @@ content: |-
   {{ .Requirements }}
 
   ## Examples
-  
+
   ### Example 1
   ```hcl
   {{ include "examples/01-new_nsg/example1.tf" }}
