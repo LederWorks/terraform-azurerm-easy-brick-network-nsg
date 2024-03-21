@@ -64,8 +64,8 @@ locals {
   # ]
 
   # Separate inbound and outbound rules 
-  default_inbound_rules = [for rule in azureazurerm_network_security_rule.default_rules : rule if rule.direction == "Inbound"]
-  default_outbound_rules = [for rule in azureazurerm_network_security_rule.default_rules : rule if rule.direction == "Outbound"]
+  default_inbound_rules = [for rule in azurerm_network_security_rule.default_rules : rule if rule.direction == "Inbound"]
+  default_outbound_rules = [for rule in azurerm_network_security_rule.default_rules : rule if rule.direction == "Outbound"]
 
   # Create a map of priority to inbound rules
   default_inbound_rules_priority_map = { for rule in local.default_inbound_rules : tostring(rule.priority) => rule }
