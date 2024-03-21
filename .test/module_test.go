@@ -24,6 +24,8 @@ func TestTerraform(t *testing.T) {
 			"storage_account_name": os.Getenv("AZURERM_BACKEND_SACC"),
 			"container_name":       os.Getenv("AZURERM_BACKEND_CONTAINER"),
 			"key":                  "easy-brick-network-nsg.default.tfstate",
+			"snapshot":             "true",
+			"use_azuread_auth":     "true",
 		},
 	})
 
