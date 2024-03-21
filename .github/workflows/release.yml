@@ -1,4 +1,4 @@
-name: Release - terraform-provider-easy-brick-category-purpose
+name: Release - terraform-azurerm-easy-brick-network-nsg
 
 on:
   push:

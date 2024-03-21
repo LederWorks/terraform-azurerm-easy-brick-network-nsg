@@ -1,6 +1,6 @@
 formatter: markdown document
 
-version: ""
+version: "v0.2.0"
 header-from: .config/header.txt
 footer-from: .config/footer.txt
 
@@ -12,7 +12,6 @@ sections:
     - inputs
     - outputs
     - requirements
-    - providers
     - resources
 
 content: |-
@@ -20,18 +19,16 @@ content: |-
 
   {{ .Requirements }}
 
-  {{ .Providers }}
-
   ## Examples
   
   ### Example 1
   ```hcl
-  {{ include ".examples/example1.tf" }}
+  {{ include "examples/01-new_nsg/example1.tf" }}
   ```
 
   ### Example 2
   ```hcl
-  {{ include ".examples/example2.tf" }}
+  {{ include "examples/02-update_nsg/example2.tf" }}
   ```
 
   {{ .Resources }}
