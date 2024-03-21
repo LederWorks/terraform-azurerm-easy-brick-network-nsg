@@ -1,6 +1,6 @@
 #AppSecGroup
-resource "azurerm_application_security_group" "asgr-tde3-ic-terratest001" {
-  name                = module.naming.application_security_group
+resource "azurerm_application_security_group" "asgr" {
+  name                = "asgr-tde3-ic-terratest001"
   location            = azurerm_resource_group.rgrp.location
   resource_group_name = azurerm_resource_group.rgrp.name
 }
@@ -69,7 +69,7 @@ module "new_nsg" {
       protocol            = "Udp"
       source_prefixes     = ["10.96.205.60/32", "10.96.205.61/32"]
       source_port         = "49152 - 65535"
-      destination_asg_ids = [azurerm_application_security_group.asgr-tva2-ic-terratest001.id]
+      destination_asg_ids = [azurerm_application_security_group.asgr.id]
       destination_ports   = ["32100 - 32200", "32300"]
     },
     {
@@ -92,7 +92,7 @@ module "new_nsg" {
       priority            = 1900
       direction           = "Inbound"
       source_prefixes     = ["10.1.0.0/16", "10.2.0.0/16"]
-      destination_asg_ids = [azurerm_application_security_group.asgr-tva2-ic-terratest001.id]
+      destination_asg_ids = [azurerm_application_security_group.asgr.id]
     }
   ]
 

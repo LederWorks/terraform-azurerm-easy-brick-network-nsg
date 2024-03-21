@@ -14,7 +14,7 @@ resource "azurerm_network_security_rule" "custom_rules" {
 
   #General
   resource_group_name         = var.resource_group_object.name
-  network_security_group_name = coalesce(azurerm_network_security_group.nsg.name, var.nsg_name)
+  network_security_group_name = coalesce(azurerm_network_security_group.nsg["nsg"].name, var.nsg_name)
   name                        = each.value.name
   description                 = coalesce(each.value.description, "Security rule for ${each.value.name}")
   priority                    = each.value.priority
@@ -39,6 +39,6 @@ resource "azurerm_network_security_rule" "custom_rules" {
 
 locals {
   custom_rules = {
-    for obj in var.nsg_custom_rules : obj.name => obj
+    for obj in azurerm_network_security_rule.custom_rules : obj.name => obj
   }
 }
