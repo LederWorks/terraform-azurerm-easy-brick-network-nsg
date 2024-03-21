@@ -18,18 +18,12 @@ output "nsg" {
   description = "The Network Security Group (NSG) created by this module."
 }
 
-output "nsg_rules" {
-  value = local.nsg_rules
-  description = "The Network Security Group (NSG) rules created by this module."
-}
-
-output "sorted_default_inbound_rules" {
-  value = local.sorted_default_inbound_rules
+output "nsg_inbound_rules" {
+  value = local.nsg_inbound_rules
   description = "The Inbound Network Security Group (NSG) default rules sorted by priority."
 }
 
-output "sorted_default_outbound_rules" {
-  value = local.sorted_default_outbound_rules
+output "nsg_outbound_rules" {
+  value = local.nsg_outbound_rules
   description = "The Outbound Network Security Group (NSG) default rules sorted by priority."
-  
 }

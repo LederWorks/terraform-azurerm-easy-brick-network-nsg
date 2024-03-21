@@ -38,32 +38,12 @@ resource "azurerm_network_security_rule" "default_rules" {
 }
 
 locals {
-  # Normalize source and destination properties
-  default_rules = [
-    for rule in azurerm_network_security_rule.default_rules : {
-      name              = rule.name
-      description       = rule.description
-      priority          = rule.priority
-      direction         = rule.direction
-      access            = rule.access
-      protocol          = rule.protocol
-      source_prefixes     = coalesce(rule.source_address_prefixes, [rule.source_address_prefix])[0]
-      source_asg_ids    = rule.source_application_security_group_ids
-      source_ports      = coalesce(rule.source_port_ranges, [rule.source_port_range])[0]
-      destination_prefixes   = coalesce(rule.destination_address_prefixes, [rule.destination_address_prefix])[0]
-      destination_asg_ids    = rule.destination_application_security_group_ids
-      destination_ports      = coalesce(rule.destination_port_ranges, [rule.destination_port_range])[0]
-    }
-  ]
-
   # Separate inbound and outbound rules 
-  default_inbound_rules = [for rule in azurerm_network_security_rule.default_rules : local.default_rules if rule.direction == "Inbound"]
-  default_outbound_rules = [for rule in azurerm_network_security_rule.default_rules : local.default_rules if rule.direction == "Outbound"]
+  default_inbound_rules = [for rule in azurerm_network_security_rule.default_rules : rule if rule.direction == "Inbound"]
+  default_outbound_rules = [for rule in azurerm_network_security_rule.default_rules : rule if rule.direction == "Outbound"]
 
-  # Create a map of priority to inbound rules
+  # Create a map of priority to rules
   default_inbound_rules_priority_map = { for rule in local.default_inbound_rules : tostring(rule.priority) => rule }
-
-  # Create a map of priority to outbound rules
   default_outbound_rules_priority_map = { for rule in local.default_outbound_rules : tostring(rule.priority) => rule }
 
   # Sort the priority keys

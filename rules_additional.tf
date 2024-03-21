@@ -38,7 +38,20 @@ resource "azurerm_network_security_rule" "additional_rules" {
 }
 
 locals {
-  additional_rules = {
-    for obj in azurerm_network_security_rule.additional_rules : obj.name => obj
-  }
+  # Separate inbound and outbound rules 
+  additional_inbound_rules = [for rule in azurerm_network_security_rule.additional_rules : rule if rule.direction == "Inbound"]
+  additional_outbound_rules = [for rule in azurerm_network_security_rule.additional_rules : rule if rule.direction == "Outbound"]
+
+  # Create a map of priority to rules
+  additional_inbound_rules_priority_map = { for rule in local.additional_inbound_rules : tostring(rule.priority) => rule }
+  additional_outbound_rules_priority_map = { for rule in local.additional_outbound_rules : tostring(rule.priority) => rule }
+
+  # Sort the priority keys
+  additional_inbound_rules_sorted_priorities = sort(keys(local.additional_inbound_rules_priority_map))
+  additional_outbound_rules_sorted_priorities = sort(keys(local.additional_outbound_rules_priority_map))
+
+  # Map the sorted priorities back to the rules
+  sorted_additional_inbound_rules = [ for priority in local.additional_inbound_rules_sorted_priorities : local.additional_inbound_rules_priority_map[priority]]
+  sorted_additional_outbound_rules = [ for priority in local.additional_outbound_rules_sorted_priorities : local.additional_outbound_rules_priority_map[priority]]
+
 }

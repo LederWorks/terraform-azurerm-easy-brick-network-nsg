@@ -21,14 +21,10 @@ output "nsg" {
   value = module.new_nsg.nsg
 }
 
-output "nsg_rules" {
-  value = module.new_nsg.nsg_rules
+output "nsg_inbound_rules" {
+  value = module.new_nsg.nsg_inbound_rules
 }
 
-output "sorted_default_inbound_rules" {
-  value = module.new_nsg.sorted_default_inbound_rules
-}
-
-output "sorted_default_outbound_rules" {
-  value = module.new_nsg.sorted_default_outbound_rules
+output "nsg_outbound_rules" {
+  value = module.new_nsg.nsg_outbound_rules
 }

@@ -19,9 +19,15 @@ locals {
     }
   } : {}
 
-  nsg_rules = merge(
-    # local.default_rules,
-    local.custom_rules,
-    local.additional_rules
+  nsg_inbound_rules = merge(
+    local.sorted_default_inbound_rules,
+    local.sorted_additional_inbound_rules,
+    local.sorted_custom_inbound_rules
+  )
+
+  nsg_outbound_rules = merge(
+    local.sorted_default_outbound_rules,
+    local.sorted_additional_outbound_rules,
+    local.sorted_custom_outbound_rules
   )
 }
