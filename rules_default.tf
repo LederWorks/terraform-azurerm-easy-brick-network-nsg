@@ -38,34 +38,27 @@ resource "azurerm_network_security_rule" "default_rules" {
 }
 
 locals {
-  # default_rules = [
-  #   for rule in azurerm_network_security_rule.default_rules : {
-  #     name              = rule.name
-  #     description       = rule.description
-  #     priority          = rule.priority
-  #     direction         = rule.direction
-  #     access            = rule.access
-  #     protocol          = rule.protocol
-  #     source_prefix     = rule.source_address_prefix
-  #     source_prefixes   = rule.source_address_prefixes
-  #     source_asg_ids    = rule.source_application_security_group_ids
-  #     source_port       = rule.source_port_range
-  #     source_ports      = rule.source_port_ranges
-  #     destination_prefix     = rule.destination_address_prefix
-  #     destination_prefixes   = rule.destination_address_prefixes
-  #     destination_asg_ids    = rule.destination_application_security_group_ids
-  #     destination_port       = rule.destination_port_range
-  #     destination_ports      = rule.destination_port_ranges
-  #     timeout_create    = rule.timeouts.create
-  #     timeout_update    = rule.timeouts.update
-  #     timeout_read      = rule.timeouts.read
-  #     timeout_delete    = rule.timeouts.delete
-  #   }
-  # ]
+  # Normalize source and destination properties
+  default_rules = [
+    for rule in azurerm_network_security_rule.default_rules : {
+      name              = rule.name
+      description       = rule.description
+      priority          = rule.priority
+      direction         = rule.direction
+      access            = rule.access
+      protocol          = rule.protocol
+      source_prefixes     = coalesce(rule.source_address_prefixes, [rule.source_address_prefix])[0]
+      source_asg_ids    = rule.source_application_security_group_ids
+      source_ports      = coalesce(rule.source_port_ranges, [rule.source_port_range])[0]
+      destination_prefixes   = coalesce(rule.destination_address_prefixes, [rule.destination_address_prefix])[0]
+      destination_asg_ids    = rule.destination_application_security_group_ids
+      destination_ports      = coalesce(rule.destination_port_ranges, [rule.destination_port_range])[0]
+    }
+  ]
 
   # Separate inbound and outbound rules 
-  default_inbound_rules = [for rule in azurerm_network_security_rule.default_rules : rule if rule.direction == "Inbound"]
-  default_outbound_rules = [for rule in azurerm_network_security_rule.default_rules : rule if rule.direction == "Outbound"]
+  default_inbound_rules = [for rule in azurerm_network_security_rule.default_rules : local.default_rules if rule.direction == "Inbound"]
+  default_outbound_rules = [for rule in azurerm_network_security_rule.default_rules : local.default_rules if rule.direction == "Outbound"]
 
   # Create a map of priority to inbound rules
   default_inbound_rules_priority_map = { for rule in local.default_inbound_rules : tostring(rule.priority) => rule }
