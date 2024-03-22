@@ -1,22 +1,18 @@
 <!-- BEGIN_TF_DOCS -->
 <!-- markdownlint-disable-file MD033 MD012 -->
-# terraform-provider-easy-brick-category-purpose
-LederWorks Easy Category Purpose Brick Module
+# terraform-provider-easy-brick-network-nsg
+LederWorks Easy Network Security Group brick module
 
 This module were created by [LederWorks](https://lederworks.com) IaC enthusiasts.
 
 ## About This Module
-This module implements the [SECTION](https://lederworks.com/docs/microsoft-azure/bricks/compute/#section) reference Insight.
+This module implements the [SECTION](https://lederworks.com/docs/microsoft-azure/bricks/network/#section) reference Insight.
 
 ## How to Use This Modul
 - Ensure Azure credentials are [in place](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#authenticating-to-azure) (e.g. `az login` and `az account set --subscription="SUBSCRIPTION_ID"` on your workstation)
 - Owner role or equivalent is required!
 - Ensure pre-requisite resources are created.
 - Create a Terraform configuration that pulls in this module and specifies values for the required variables.
-
-## Disclaimer / Known Issues
-- Disclaimer
-- Known Issues
 
 ## Requirements
 
@@ -26,16 +22,153 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.64.0)
 
-## Examples
+## Example
 
-### Example 1
 ```hcl
-#Example
-```
+#AppSecGroup
+resource "azurerm_application_security_group" "asgr" {
+  name                = "asgr-tde3-ic-terratest001"
+  location            = azurerm_resource_group.rgrp.location
+  resource_group_name = azurerm_resource_group.rgrp.name
+}
 
-### Example 2
-```hcl
-#Example
+# Test create NSG functionality
+module "new_nsg" {
+  source = "../"
+
+  #Subscription
+  subscription_id = data.azurerm_client_config.current.subscription_id
+
+  #Resource Group
+  resource_group_object = azurerm_resource_group.rgrp
+
+  #Tags
+  tags = local.tags
+
+  #Variables
+  nsg_deploy = true
+  nsg_name   = "nsgr-tde3-ic-terratest001"
+
+  nsg_timeout_create = "45m"
+  nsg_timeout_update = "45m"
+  nsg_timeout_read   = "4m"
+  nsg_timeout_delete = "20m"
+
+  nsg_default_rules = [
+    {
+      name        = "New-Default01-Out"
+      description = "Any Any"
+      priority    = 1000
+      direction   = "Outbound"
+      # access = Deny #Default Allow
+      # protocol = "Tcp" #Default *
+
+      # source_prefix = ""
+      # source_prefixes = []
+      # source_asg_ids = []
+      # source_port = ""
+      # source_ports = []
+
+      # destination_prefix = ""
+      # destination_prefixes = []
+      # destination_asg_ids = []
+      # destination_port = ""
+      # destination_ports = []
+
+      timeout_create = "30m"
+      timeout_update = "30m"
+      timeout_read   = "10m"
+      timeout_delete = "30m"
+    },
+    {
+      name              = "New-Default02-Out"
+      priority          = 1010
+      direction         = "Outbound"
+      protocol          = "Tcp"
+      source_prefix     = "10.96.205.56/29"
+      destination_ports = ["80", "443"]
+    },
+    {
+      name                = "New-Default03-Out"
+      description         = "Any Any"
+      priority            = 1020
+      direction           = "Outbound"
+      protocol            = "Udp"
+      source_prefixes     = ["10.96.205.60/32", "10.96.205.61/32"]
+      source_port         = "49152 - 65535"
+      destination_asg_ids = [azurerm_application_security_group.asgr.id]
+      destination_ports   = ["32100 - 32200", "32300"]
+    },
+    {
+      name      = "Deny-In"
+      access    = "Deny"
+      priority  = 4000
+      direction = "Inbound"
+    },
+    {
+      name      = "Deny-Out"
+      access    = "Deny"
+      priority  = 4000
+      direction = "Outbound"
+    }
+  ]
+
+  nsg_additional_rules = [
+    {
+      name                = "New-Additional01-In"
+      priority            = 1900
+      source_prefixes     = ["10.1.0.0/16", "10.2.0.0/16"]
+      destination_asg_ids = [azurerm_application_security_group.asgr.id]
+    }
+  ]
+
+  nsg_custom_rules = [
+    {
+      name                   = "New-Custom01-In"
+      priority               = 3000
+      source_prefixes        = ["10.3.0.0/16", "10.4.0.0/16"]
+      destination_port_range = "80,443"
+    }
+  ]
+}
+
+# Test update NSG functionality
+module "update_nsg" {
+  source = "../"
+
+  subscription_id       = data.azurerm_client_config.current.subscription_id
+  resource_group_object = azurerm_resource_group.rgrp
+  tags                  = local.tags
+  nsg_deploy            = false
+  nsg_name              = module.new_nsg.nsg.name
+
+  nsg_default_rules = [
+    {
+      name                = "Update-Default01-In"
+      priority            = 1030
+      source_prefixes     = ["10.1.0.0/16", "10.2.0.0/16"]
+      destination_asg_ids = [azurerm_application_security_group.asgr.id]
+    }
+  ]
+
+  nsg_additional_rules = [
+    {
+      name                = "Update-Additional01-In"
+      priority            = 1910
+      source_prefixes     = ["10.1.0.0/16", "10.2.0.0/16"]
+      destination_asg_ids = [azurerm_application_security_group.asgr.id]
+    }
+  ]
+
+  nsg_custom_rules = [
+    {
+      name                   = "Update-Custom01-Out"
+      priority               = 3100
+      direction              = "Outbound"
+      destination_port_range = "80,443"
+    }
+  ]
+}
 ```
 
 ## Resources
@@ -346,9 +479,13 @@ Description: The Client ID of the Azure account used to deploy the Network Secur
 
 Description: The Network Security Group (NSG) created by this module.
 
-### <a name="output_nsg_rules"></a> [nsg\_rules](#output\_nsg\_rules)
+### <a name="output_nsg_inbound_rules"></a> [nsg\_inbound\_rules](#output\_nsg\_inbound\_rules)
 
-Description: The Network Security Group (NSG) rules created by this module.
+Description: The Inbound Network Security Group (NSG) default rules sorted by priority.
+
+### <a name="output_nsg_outbound_rules"></a> [nsg\_outbound\_rules](#output\_nsg\_outbound\_rules)
+
+Description: The Outbound Network Security Group (NSG) default rules sorted by priority.
 
 ### <a name="output_subscription_id"></a> [subscription\_id](#output\_subscription\_id)
 
@@ -374,7 +511,7 @@ Description: The Tenant ID of the Azure account used to deploy the Network Secur
 ```text
 MIT License
 
-Copyright (c) 2023 LederWorks
+Copyright (c) 2024 LederWorks
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
