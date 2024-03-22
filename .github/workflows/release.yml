@@ -1,12 +1,9 @@
-name: Release - terraform-provider-easy-brick-category-purpose
+name: Release - terraform-azurerm-easy-brick-network-nsg
 
 on:
   push:
     branches:
       - main
-
-# on:
-#   - pull_request
 
 jobs:
   docs:
@@ -28,6 +25,14 @@ jobs:
       with:
         token: '${{ secrets.GITHUB_TOKEN }}'
 
+    - name: Get PR Number
+      id: pr
+      run: |
+        PR_NUMBER=$(curl --silent --show-error --location --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/pulls | jq '.[0].number')
+        echo "::set-output name=number::$PR_NUMBER"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Generate Changelog
       id: changelog
       run: npm i conventional-changelog-angular
@@ -44,7 +49,7 @@ jobs:
       run: echo "The determined version is v${{ steps.gitversion.outputs.MajorMinorPatch }}"
 
     - name: Create Git Semver Tag
-      run: git tag --annotate --message "PR#${{ github.event.number }}" v${{ steps.gitversion.outputs.MajorMinorPatch }}
+      run: git tag --annotate --message "PR#${{ steps.pr.outputs.number }}" v${{ steps.gitversion.outputs.MajorMinorPatch }}
     
     - name: Create Git Short Tag
       run: git tag --force "v${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"
@@ -53,7 +58,7 @@ jobs:
       run: git tag --force "latest"
 
     - name: Create Git Stable Tag - Optional
-      if: contains(github.event.head_commit.message, '+stable') || contains(github.event.pull_request.body, '+stable')
+      if: contains(github.event.head_commit.message, '+stable')
       run: git tag --force "v${{ steps.gitversion.outputs.major }}.${{ steps.gitversion.outputs.minor }}-stable"
 
     - name: Push tags to repository

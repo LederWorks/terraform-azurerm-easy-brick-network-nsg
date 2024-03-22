@@ -12,7 +12,6 @@ sections:
     - inputs
     - outputs
     - requirements
-    - providers
     - resources
 
 content: |-
@@ -20,18 +19,10 @@ content: |-
 
   {{ .Requirements }}
 
-  {{ .Providers }}
+  ## Example
 
-  ## Examples
-  
-  ### Example 1
   ```hcl
-  {{ include ".examples/example1.tf" }}
-  ```
-
-  ### Example 2
-  ```hcl
-  {{ include ".examples/example2.tf" }}
+  {{ include "example/test.tf" }}
   ```
 
   {{ .Resources }}
