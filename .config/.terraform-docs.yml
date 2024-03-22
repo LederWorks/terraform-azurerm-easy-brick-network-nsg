@@ -19,16 +19,10 @@ content: |-
 
   {{ .Requirements }}
 
-  ## Examples
+  ## Example
 
-  ### Example 1
   ```hcl
-  {{ include "examples/01-new_nsg/example1.tf" }}
-  ```
-
-  ### Example 2
-  ```hcl
-  {{ include "examples/02-update_nsg/example2.tf" }}
+  {{ include "example/test.tf" }}
   ```
 
   {{ .Resources }}
