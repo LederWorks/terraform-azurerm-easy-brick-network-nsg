@@ -115,5 +115,5 @@ module "update_nsg" {
   resource_group_object = azurerm_resource_group.rgrp
   tags                  = local.tags
   nsg_deploy            = false
-  nsg_name              = module.new_nsg.nsg.name  #"nsgr-tde3-ic-terratest001"
+  nsg_name              = module.new_nsg.nsg["nsg"].name  #"nsgr-tde3-ic-terratest001"
 }
