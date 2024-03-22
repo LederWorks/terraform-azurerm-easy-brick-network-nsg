@@ -86,15 +86,15 @@ module "new_nsg" {
     }
   ]
 
-  nsg_additional_rules = [
-    {
-      name                = "Additional-Test"
-      priority            = 1900
-      direction           = "Inbound"
-      source_prefixes     = ["10.1.0.0/16", "10.2.0.0/16"]
-      destination_asg_ids = [azurerm_application_security_group.asgr.id]
-    }
-  ]
+  # nsg_additional_rules = [
+  #   {
+  #     name                = "Additional-Test"
+  #     priority            = 1900
+  #     direction           = "Inbound"
+  #     source_prefixes     = ["10.1.0.0/16", "10.2.0.0/16"]
+  #     destination_asg_ids = [azurerm_application_security_group.asgr.id]
+  #   }
+  # ]
 
   nsg_custom_rules = [
     {
