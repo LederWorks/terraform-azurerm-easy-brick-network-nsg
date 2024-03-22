@@ -53,5 +53,4 @@ locals {
   # Map the sorted priorities back to the rules
   sorted_additional_inbound_rules  = [for priority in local.additional_inbound_rules_sorted_priorities : local.additional_inbound_rules_priority_map[priority]]
   sorted_additional_outbound_rules = [for priority in local.additional_outbound_rules_sorted_priorities : local.additional_outbound_rules_priority_map[priority]]
-
 }

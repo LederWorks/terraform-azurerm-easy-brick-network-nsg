@@ -29,12 +29,12 @@ module "new_nsg" {
 
   nsg_default_rules = [
     {
-      name        = "foreach1"
+      name        = "New-Default01-Out"
       description = "Any Any"
       priority    = 1000
       direction   = "Outbound"
       # access = Deny #Default Allow
-      # protocol = "Tcp"
+      # protocol = "Tcp" #Default *
 
       # source_prefix = ""
       # source_prefixes = []
@@ -54,7 +54,7 @@ module "new_nsg" {
       timeout_delete = "30m"
     },
     {
-      name              = "foreach2"
+      name              = "New-Default02-Out"
       priority          = 1010
       direction         = "Outbound"
       protocol          = "Tcp"
@@ -62,7 +62,7 @@ module "new_nsg" {
       destination_ports = ["80", "443"]
     },
     {
-      name                = "foreach3"
+      name                = "New-Default03-Out"
       description         = "Any Any"
       priority            = 1020
       direction           = "Outbound"
@@ -88,9 +88,8 @@ module "new_nsg" {
 
   nsg_additional_rules = [
     {
-      name                = "Additional-Test"
+      name                = "New-Additional01-In"
       priority            = 1900
-      direction           = "Inbound"
       source_prefixes     = ["10.1.0.0/16", "10.2.0.0/16"]
       destination_asg_ids = [azurerm_application_security_group.asgr.id]
     }
@@ -98,9 +97,8 @@ module "new_nsg" {
 
   nsg_custom_rules = [
     {
-      name                   = "Custom-Test"
+      name                   = "New-Custom01-In"
       priority               = 3000
-      direction              = "Inbound"
       source_prefixes        = ["10.3.0.0/16", "10.4.0.0/16"]
       destination_port_range = "80,443"
     }
@@ -115,5 +113,32 @@ module "update_nsg" {
   resource_group_object = azurerm_resource_group.rgrp
   tags                  = local.tags
   nsg_deploy            = false
-  nsg_name              = module.new_nsg.nsg.name  #"nsgr-tde3-ic-terratest001"
+  nsg_name              = module.new_nsg.nsg.name
+
+  nsg_default_rules = [
+    {
+      name                = "Update-Default01-In"
+      priority            = 1030
+      source_prefixes     = ["10.1.0.0/16", "10.2.0.0/16"]
+      destination_asg_ids = [azurerm_application_security_group.asgr.id]
+    }
+  ]
+
+  nsg_additional_rules = [
+    {
+      name                = "Update-Additional01-In"
+      priority            = 1910
+      source_prefixes     = ["10.1.0.0/16", "10.2.0.0/16"]
+      destination_asg_ids = [azurerm_application_security_group.asgr.id]
+    }
+  ]
+
+  nsg_custom_rules = [
+    {
+      name                   = "Update-Custom01-Out"
+      priority               = 3100
+      direction              = "Outbound"
+      destination_port_range = "80,443"
+    }
+  ]
 }
