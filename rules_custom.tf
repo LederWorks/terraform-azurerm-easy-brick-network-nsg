@@ -39,19 +39,19 @@ resource "azurerm_network_security_rule" "custom_rules" {
 
 locals {
   # Separate inbound and outbound rules 
-  custom_inbound_rules = [for rule in azurerm_network_security_rule.custom_rules : rule if rule.direction == "Inbound"]
+  custom_inbound_rules  = [for rule in azurerm_network_security_rule.custom_rules : rule if rule.direction == "Inbound"]
   custom_outbound_rules = [for rule in azurerm_network_security_rule.custom_rules : rule if rule.direction == "Outbound"]
 
   # Create a map of priority to rules
-  custom_inbound_rules_priority_map = { for rule in local.custom_inbound_rules : tostring(rule.priority) => rule }
+  custom_inbound_rules_priority_map  = { for rule in local.custom_inbound_rules : tostring(rule.priority) => rule }
   custom_outbound_rules_priority_map = { for rule in local.custom_outbound_rules : tostring(rule.priority) => rule }
 
   # Sort the priority keys
-  custom_inbound_rules_sorted_priorities = sort(keys(local.custom_inbound_rules_priority_map))
+  custom_inbound_rules_sorted_priorities  = sort(keys(local.custom_inbound_rules_priority_map))
   custom_outbound_rules_sorted_priorities = sort(keys(local.custom_outbound_rules_priority_map))
 
   # Map the sorted priorities back to the rules
-  sorted_custom_inbound_rules = [ for priority in local.custom_inbound_rules_sorted_priorities : local.custom_inbound_rules_priority_map[priority]]
-  sorted_custom_outbound_rules = [ for priority in local.custom_outbound_rules_sorted_priorities : local.custom_outbound_rules_priority_map[priority]]
+  sorted_custom_inbound_rules  = [for priority in local.custom_inbound_rules_sorted_priorities : local.custom_inbound_rules_priority_map[priority]]
+  sorted_custom_outbound_rules = [for priority in local.custom_outbound_rules_sorted_priorities : local.custom_outbound_rules_priority_map[priority]]
 
 }

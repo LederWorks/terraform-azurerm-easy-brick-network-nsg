@@ -1,7 +1,7 @@
 locals {
   tags = {
-    one = "chicken"
+    one   = "chicken"
     water = "boil"
-    hurt = "six"
+    hurt  = "six"
   }
 }

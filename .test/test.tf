@@ -5,7 +5,7 @@ resource "azurerm_application_security_group" "asgr" {
   resource_group_name = azurerm_resource_group.rgrp.name
 }
 
-# Module Test
+# Test create NSG functionality
 module "new_nsg" {
   source = "../"
 
@@ -20,7 +20,7 @@ module "new_nsg" {
 
   #Variables
   nsg_deploy = true
-  nsg_name = "nsgr-tde3-ic-terratest001"
+  nsg_name   = "nsgr-tde3-ic-terratest001"
 
   nsg_timeout_create = "45m"
   nsg_timeout_update = "45m"
@@ -86,23 +86,34 @@ module "new_nsg" {
     }
   ]
 
-  # nsg_additional_rules = [
-  #   {
-  #     name                = "Additional-Test"
-  #     priority            = 1900
-  #     direction           = "Inbound"
-  #     source_prefixes     = ["10.1.0.0/16", "10.2.0.0/16"]
-  #     destination_asg_ids = [azurerm_application_security_group.asgr.id]
-  #   }
-  # ]
+  nsg_additional_rules = [
+    {
+      name                = "Additional-Test"
+      priority            = 1900
+      direction           = "Inbound"
+      source_prefixes     = ["10.1.0.0/16", "10.2.0.0/16"]
+      destination_asg_ids = [azurerm_application_security_group.asgr.id]
+    }
+  ]
 
   nsg_custom_rules = [
     {
-      name                    = "Custom-Test"
-      priority                = 3000
-      direction               = "Inbound"
-      source_prefixes = ["10.3.0.0/16", "10.4.0.0/16"]
-      destination_port_range  = "80,443"
+      name                   = "Custom-Test"
+      priority               = 3000
+      direction              = "Inbound"
+      source_prefixes        = ["10.3.0.0/16", "10.4.0.0/16"]
+      destination_port_range = "80,443"
     }
   ]
+}
+
+# Test update NSG functionality
+module "update_nsg" {
+  source = "../"
+
+  subscription_id       = data.azurerm_client_config.current.subscription_id
+  resource_group_object = azurerm_resource_group.rgrp
+  tags                  = local.tags
+  nsg_deploy            = false
+  nsg_name              = module.new_nsg.nsg.name  #"nsgr-tde3-ic-terratest001"
 }
