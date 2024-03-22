@@ -11,12 +11,10 @@ locals {
 
   #NSG
   nsg = var.nsg_deploy ? {
-    "${azurerm_network_security_group.nsg["nsg"].name}" = {
-      name                = azurerm_network_security_group.nsg["nsg"].name
-      id                  = azurerm_network_security_group.nsg["nsg"].id
-      resource_group_name = azurerm_network_security_group.nsg["nsg"].resource_group_name
-      location            = azurerm_network_security_group.nsg["nsg"].location
-    }
+    name                = azurerm_network_security_group.nsg["nsg"].name
+    id                  = azurerm_network_security_group.nsg["nsg"].id
+    resource_group_name = azurerm_network_security_group.nsg["nsg"].resource_group_name
+    location            = azurerm_network_security_group.nsg["nsg"].location
   } : {}
 
   nsg_inbound_rules = concat(
