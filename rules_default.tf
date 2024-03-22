@@ -14,7 +14,7 @@ resource "azurerm_network_security_rule" "default_rules" {
 
   #General
   resource_group_name         = var.resource_group_object.name
-  network_security_group_name = var.nsg_name
+  network_security_group_name = coalesce(azurerm_network_security_group.nsg.name.value, var.nsg_name)
   name                        = each.value.name
   description                 = coalesce(each.value.description, "Security rule for ${each.value.name}")
   priority                    = each.value.priority
